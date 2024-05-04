@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import ToolOptions from "../get-tool-tips";
-import axios from "axios";
 
 const months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
@@ -12,10 +11,9 @@ const monthChunks = Array.from(
 );
 const years = [2021, 2022, 2023, 2024, 2025, 2026, 2027];
 
-export default async function GetMusicsByYearAndMonth() {
+export default async function SeasonSelector() {
   // Get the current date
   let today = new Date();
-  let todayQuery = today.toISOString().substring(0, 10);
 
   // Set the initial state for the selected month and year
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
@@ -29,31 +27,11 @@ export default async function GetMusicsByYearAndMonth() {
     setSelectedYear(selectedYear);
   };
 
-  const [tracksData, setTracksData] = useState(null);
-  useEffect(() => {
-    // This useEffect is just a placeholder to simulate fetching data or similar side effects
-    // It was inspired by the useEffect seen in the year selection file to fetch insights
-    // Replace with actual logic as needed
-    console.log("Component did mount or update due to year or month change");
-    // Make the fetch request
-    const apiUrl = `http://localhost:8081/insight/monthAndYear?year=${selectedYear}&month=${selectedMonth}`;
-    fetch(apiUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setTracksData(data);
-        // Handle the data returned from the server
-        console.log(`Period: ${selectedYear}-${selectedMonth}`);
-        console.log("Received data:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [selectedYear, selectedMonth]); // Dependencies to re-run the effect
+  // This useEffect is just a placeholder to simulate fetching data or similar side effects
+  // It was inspired by the useEffect seen in the year selection file to fetch insights
+  // Replace with actual logic as needed
+  console.log("Component did mount or update due to year or month change");
+  // Make the fetch request
 
   // Construct the URL
 
