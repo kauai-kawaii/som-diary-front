@@ -208,7 +208,14 @@ export default function Location() {
                 value="확인"
                 onClick={() => {
                     if (location) {
-                        navigate(`/diary`, { state: { location } });
+                        // 현재 URL에서 저장된 날짜 추출
+                        const save_date = window.location.pathname.split('/').pop();
+                        if (save_date) {
+                            // 선택한 위치 정보와 함께 다이어리 페이지로 이동
+                            navigate(`/diary/${save_date}`, { state: { location } });
+                        } else {
+                            alert('유효한 날짜가 없습니다!');
+                        }
                     } else {
                         alert('위치를 선택하세요!');
                     }
