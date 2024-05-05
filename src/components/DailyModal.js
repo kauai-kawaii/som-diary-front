@@ -5,6 +5,7 @@ function DailyModal({ setModalOpen, userId, date }) {
     const navigate = useNavigate();
     const [diary, setDiary] = useState(null);
     const [loading, setLoading] = useState(true);
+    const image = process.env.PUBLIC_URL + '/img/rabbit.jpg';
 
     useEffect(() => {
         const formattedDateForSave = new Intl.DateTimeFormat('ko-KR', {
@@ -14,8 +15,7 @@ function DailyModal({ setModalOpen, userId, date }) {
         }).format(date);
 
         const parts = formattedDateForSave.split('. ');
-        const save_date = `${parts[0]}-${parts[1]}-${parts[2].slice(0, 2)}`;
-        console.log(save_date); //2024-02-24
+        const save_date = `${parts[0]}-${parts[1]}-${parts[2].slice(0, 2)}`; //2024-02-24
 
         const apiUrl = `/user/123/${save_date}`;
 
@@ -34,7 +34,7 @@ function DailyModal({ setModalOpen, userId, date }) {
                 console.error('다이어리 데이터 fetch 실패:', error);
                 setDiary(null); // 다이어리 데이터 초기화
                 setLoading(false);
-            });
+            });   
     }, []);
 
 
@@ -49,7 +49,7 @@ function DailyModal({ setModalOpen, userId, date }) {
     // 해당 다이어리 삭제
     const deleteDiary = () => {
         if(diary && window.confirm(`${diary.diaryDate} 다이어리를 정말 삭제할까요?`)){
-            axios.delete(`/api/diary/${diary.diaryId}`)
+            axios.delete(`/diary/${diary.diaryId}`)
                 .then(function(response){
                     console.log(response);
                     closeModal();
@@ -84,6 +84,13 @@ function DailyModal({ setModalOpen, userId, date }) {
                             <div className='flex'>
                                 <div className='mr-1'>{':)'}</div>
                                 <div>{formattedDate}</div>
+                                
+                                    {diary.diaryFeeling && (
+                                        <div>
+                                        {diary.diaryFeeling === "신남" ? "🤗" : diary.diaryFeeling === "하트" ? "🥰" : diary.diaryFeeling === "슬픔" ? "😥" : diary.diaryFeeling === "화남" ? "🤬" : diary.diaryFeeling}
+                                       </div>
+
+                                    )}
                             </div>
                             <div className='flex'>
                                 {/* 삭제 버튼 */}
@@ -138,38 +145,23 @@ function DailyModal({ setModalOpen, userId, date }) {
                         </div>
                         {/* content */}
                         <div className='flex mt-2'>
-                            <div className='border-2 mr-4 w-52 h-40'>{'photo'}</div>
+                        <div className='border-2 mr-4 w-52 h-40 relative'>
+                            <img
+                                src={diary.diaryPhoto || image}
+                                alt='Diary Photo'
+                                className='absolute top-0 left-0 w-full h-full object-cover'
+                            />
+                        </div>
+
                             <div className='w-[100%]'>
                                 <div className='flex justify-between'>
                                     <div>{diary.diaryTitle}</div>
-                                    <div className='flex'>
-                                        <svg
-                                            xmlns='http://www.w3.org/2000/svg'
-                                            fill='none'
-                                            viewBox='0 0 24 24'
-                                            strokeWidth='1.5'
-                                            stroke='currentColor'
-                                            className='w-6 h-6 mr-1'
-                                        >
-                                            <path
-                                                strokeLinecap='round'
-                                                strokeLinejoin='round'
-                                                d='M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
-                                            />
-                                            <path
-                                                strokeLinecap='round'
-                                                strokeLinejoin='round'
-                                                d='M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z'
-                                            />
-                                        </svg>
-                                        <div>{'Crush - 위키미키'}</div>
-                                    </div>
                                 </div>
                                 <hr></hr>
                                 <div>{diary.diaryWriting}</div>
                             </div>
                         </div>
-                        <div className=' text-xs'>{'대구 수성구 이디야'}</div>
+                        <div className=' text-xs'>{diary.diaryAddressName}</div>
                     </div>
                 </div>
             )}
