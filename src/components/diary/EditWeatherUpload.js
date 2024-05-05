@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function WeatherUpload({ data, setWeatherData,savedWeather }) {
     const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
-    // const [weatherInfo, setWeatherInfo] = useState({
-    //     temperature: null,
-    //     description: ""
-    // });
+
     const [weatherInfo, setWeatherInfo] = useState(null);
     const [error, setError] = useState(null);
 
@@ -42,7 +39,6 @@ export default function WeatherUpload({ data, setWeatherData,savedWeather }) {
     }, []);
 
     useEffect(() => {
-        // 날씨 정보가 변경될 때마다 Diary 컴포넌트로 업데이트된 날씨 정보 전달
         setWeatherData(weatherInfo);
     }, [weatherInfo, setWeatherData]);
 
