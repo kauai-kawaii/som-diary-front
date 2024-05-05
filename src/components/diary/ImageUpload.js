@@ -10,8 +10,7 @@ export default function ImageUpload({ onImageChange }){
             const reader = new FileReader();
             reader.onloadend = () => {
                 setSelectedImage(reader.result);
-                console.log('Selected Image:', reader.result);
-                onImageChange(reader.result);
+                onImageChange(file);
             };
             reader.readAsDataURL(file);
         } else {
