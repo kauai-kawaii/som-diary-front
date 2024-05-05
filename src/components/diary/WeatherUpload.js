@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 
 export default function WeatherUpload({ data, setWeatherData }) {
     const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
-    const [weatherInfo, setWeatherInfo] = useState({
-        temperature: null,
-        description: ""
-    });
+    // const [weatherInfo, setWeatherInfo] = useState({
+    //     temperature: null,
+    //     description: ""
+    // });
+    const [weatherInfo, setWeatherInfo] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -16,7 +17,7 @@ export default function WeatherUpload({ data, setWeatherData }) {
             const getWeather = async (lat, lon) => {
                 try {
                     const response = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=kr`
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric&lang=kr`
                     );
 
                     if (!response.ok) {
@@ -24,10 +25,11 @@ export default function WeatherUpload({ data, setWeatherData }) {
                     }
 
                     const json = await response.json();
-                    setWeatherInfo({
-                        temperature: json.main.temp,
-                        description: json.weather[0].description
-                    });
+                    // setWeatherInfo({
+                    //     temperature: json.main.temp,
+                    //     description: json.weather[0].description
+                    // });
+                    setWeatherInfo(json.main.temp)
                 } catch (error) {
                     setError(error.message);
                 }
@@ -49,7 +51,7 @@ export default function WeatherUpload({ data, setWeatherData }) {
                     {error ? (
                         <p className="text-center">{error}</p>
                     ) : (
-                        <p className="text-center">{weatherInfo.temperature !== null ? `${weatherInfo.temperature}℃ ${weatherInfo.description}` : '날씨 정보 없음'}</p>
+                        <p className="text-center">{weatherInfo !== null ? `${weatherInfo}℃ ` : '날씨 정보 없음'}</p>
                     )}
                 </div>
             </div>
