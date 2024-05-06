@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 
-export default function WeatherUpload({ data, setWeatherData }) {
+export default function WeatherUpload({ data, setWeatherData,savedWeather }) {
     const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+
     const [weatherInfo, setWeatherInfo] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (savedWeather) {
+            setWeatherInfo(savedWeather);
+        } else {
+            console.log("날씨정보없음")
+        }
+
         if (data) {
             const latitude = data.y;
             const longitude = data.x;
@@ -21,7 +28,7 @@ export default function WeatherUpload({ data, setWeatherData }) {
                     }
 
                     const json = await response.json();
-                    setWeatherInfo(json.main.temp)
+                    setWeatherInfo(json.main.temp);
                 } catch (error) {
                     setError(error.message);
                 }
@@ -42,7 +49,7 @@ export default function WeatherUpload({ data, setWeatherData }) {
                     {error ? (
                         <p className="text-center">{error}</p>
                     ) : (
-                        <p className="text-center">{weatherInfo !== null ? `${weatherInfo}℃ ` : '날씨 정보 없음'}</p>
+                        <p className="text-center">{weatherInfo !== null ? `${weatherInfo}°C ` : '날씨 정보 없음'}</p>
                     )}
                 </div>
             </div>

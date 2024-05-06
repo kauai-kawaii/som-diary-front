@@ -6,6 +6,7 @@ import Start from "./pages/Start";
 import Main from "./pages/Main";
 import Diary from "./pages/Diary";
 import EditDiary from "./pages/EditDiary";
+import EditLocation from "./pages/EditLocation";
 import Location from "./pages/Location";
 import Insight from "./pages/Insight";
 
@@ -27,12 +28,13 @@ function App() {
         <Route path="/home" exact element={<Home />} />
         <Route path="/get-start" exact element={<Start />} />
         <Route path="/main" exact element={<Main />} />
-        <Route path="/insight" exact element={<Insight />} />
-        <Route path="/diary" element={<Diary />} />
-        {/* 특정 날짜의 일기 페이지에 대한 라우트 */}
+        <Route path="/insight" element={<Insight />} />
+        <Route path="/edit/:save_date" element={<EditDiary />} />
+        <Route path="/search-location/:save_date" element={<Location />} />
+        <Route path="/edit/search-location/:save_date" element={<EditLocation />} />
         <Route path="/diary/:save_date" element={<Diary />} />
-        <Route path="/edit" element={<EditDiary />} />
-        <Route path="/search-location" element={<Location />} />
+
+
       </Routes>
     </Router>
   );

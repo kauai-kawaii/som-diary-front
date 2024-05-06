@@ -1,89 +1,150 @@
-// import ImageUpload from '../components/diary/ImageUpload';
 import Logo from '../components/Logo';
 import WeatherUpload from '../components/diary/WeatherUpload';
 import ToolOptions from '../components/diary/Options'
 import { useState,useEffect } from 'react';
-import Music from '../components/diary/Music';
 import {Link, useNavigate , useLocation, useParams} from 'react-router-dom';
 import ImageUpload from "../components/diary/ImageUpload";
+import { uploadToS3 } from './uploadToS3';
 
 export default function Diary() {
 
     const {save_date} = useParams();
     const navigate = useNavigate();
-    const [selectedRate, setSelectedRate] = useState('위치 별점주기');
-    const [writingData, setWritingData] = useState('')
+
+    const [selectedRate, setSelectedRate] = useState(null);
+    const [selectedEmoji, setSelectedEmoji] = useState('기분');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedWeather, setSelectedWeather] = useState(null);
+    const [selectedTitle, setSelectedTitle] = useState(null);
+    const [selectedWriting, setSelectedWriting] = useState(null);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [selectedAddressName, setSelectedAddressName] = useState(null);
+
     const rates = ['0점', '1점', '2점', '3점', '4점', '5점', '취소'];
     const locationData = useLocation();
     const locationInfo = locationData.state ? locationData.state.location[0] : null;
-    const address = locationInfo?.address ?? null;
-    const name = locationInfo ? locationInfo.name : null;
+    const address = locationInfo?.address ?? null; // 다이어리 주소
+    const name = locationInfo ? locationInfo.name : null; // 다이어리 도로명 주소
     const y = locationInfo ? locationInfo.y : null;
     const x = locationInfo ? locationInfo.x : null;
+    
+    useEffect(() => {
+        if (locationInfo) {
+            setSelectedAddress(locationInfo.address);
+            setSelectedAddressName(locationInfo.name);
+        }
+    }, [locationInfo]);
 
     const images = Array(4).fill(process.env.PUBLIC_URL + '/img/rabbit.jpg');
-    const [selectedEmoji, setSelectedEmoji] = useState('기분');
     const emojis = ['😊', '😥', '🤗', '🤬','🥰'];
 
-    // 일기내용
-    const handleWritingChange = (event) => {
-        setWritingData(event.target.value);
-    }
-
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [selectedWeather, setSelectedWeather] = useState(null);
 
     const handleImageChange = (image) => {
         if (image) {
             setSelectedImage(image);
-            console.log("전달받은이미지",image);
-            const d = atob(image)
-            console.log(d)
+            console.log("전달받은 사진",image)
         } else{
-            console.log("없어요 사진")
+            setSelectedImage(null);
+            console.log("전달받은 사진이 없습니다.")
         }
     }
     const handleEmojiClick = (emoji) => {
         setSelectedEmoji(emoji);
     };
     const handleVisitRateClick = (rate) => {
-        setSelectedRate(rate === "취소" ? "위치 별점주기" : rate);
+        setSelectedRate(rate === "취소" ? null : rate === "위치 별점주기" ? null : rate);
     };
     const handleWeatherChange = (weatherData) => {
         setSelectedWeather(weatherData);
     }
 
-    // 음악 추천
-
     useEffect(() => {
-        const inputTitle =  document.querySelector('#title').value
-        const inputWriting = document.querySelector('#content').value
-        const handleButtonClick = (event) => {
-            // const titleValue = inputTitle.trim();
+        const handleBackNavigation = (event) => {
             event.preventDefault();
+            event.returnValue = '';
+            sessionStorage.removeItem(`diaryTitle_${save_date}`);
+            sessionStorage.removeItem(`diaryContent_${save_date}`);
+            sessionStorage.removeItem(`diaryPhoto_${save_date}`);
+            sessionStorage.removeItem(`diaryFeeling_${save_date}`);
+        };
+    
+        window.addEventListener('popstate', handleBackNavigation);
+    
+        return () => {
+            window.removeEventListener('popstate', handleBackNavigation);
+        };
+    }, []);
+    
+    useEffect(() => {
+        const localSavedTitle = sessionStorage.getItem(`diaryTitle_${save_date}`) || '';
+        const localSavedContent = sessionStorage.getItem(`diaryContent_${save_date}`) || '';
+        const localSavedImage = sessionStorage.getItem(`diaryPhoto_${save_date}`) || '';
+        const localSavedEmoji = sessionStorage.getItem(`diaryFeeling_${save_date}`) || '기분';
+        setSelectedTitle(localSavedTitle || ''); // 초기값을 빈 문자열로 설정
+        setSelectedWriting(localSavedContent || ''); 
+        setSelectedImage(localSavedImage || null);
+        setSelectedEmoji(localSavedEmoji || '기분');
+    }, [save_date]);
+
+    const handleLocationClick = () => {
+        sessionStorage.setItem(`diaryTitle_${save_date}`, selectedTitle);
+        sessionStorage.setItem(`diaryContent_${save_date}`, selectedWriting);
+        sessionStorage.setItem(`diaryPhoto_${save_date}`, selectedImage);
+        sessionStorage.setItem(`diaryFeeling_${save_date}`, selectedEmoji);
+    };
+
+    const handleCancelWriting = () => {
+        sessionStorage.removeItem(`diaryTitle_${save_date}`);
+        sessionStorage.removeItem(`diaryContent_${save_date}`);
+        sessionStorage.removeItem(`diaryPhoto_${save_date}`);
+        sessionStorage.removeItem(`diaryFeeling_${save_date}`);
+    };
+
+    
+    useEffect(() => {
+        const handleButtonClick = async (event) => {
+            event.preventDefault();
+
+            // 다이어리 제목, 내용 입력 확인 Not Null
+            const title = document.querySelector('#title').value;
+            const content = document.querySelector('#content').value;
+            if(!title.trim()){
+                alert("제목을 입력해주세요.");
+                return;
+            }
+            if(!content.trim()){
+                alert("일기 내용을 입력해주세요.");
+                return;
+            }
+
+            // 이미지를 S3에 업로드
+            let imageUrl = null;
+            if (selectedImage) {
+                try {
+                    imageUrl = await uploadToS3(selectedImage);
+                } catch (error) {
+                    console.error('S3에 이미지 업로드 실패', error);
+                    return;
+                }
+            }
+
             const diaryData = {
                 userId: document.querySelector("#new-diary-user-id").value,
-                diaryPhoto: selectedImage,
+                diaryPhoto: imageUrl,
                 diaryDate: save_date,
                 diaryFeeling: selectedEmoji === '😊' ? '행복' : selectedEmoji === '😥' ? "슬픔" : selectedEmoji === '🤗' ? "신남" : selectedEmoji === '🤬' ? "화남" : selectedEmoji === "🥰" ? "하트" : selectedEmoji === '기분' ? null : selectedEmoji,
                 diaryLatitude: y,
                 diaryLongitude: x,
-                diaryVisitRate: selectedRate === "취소" || "위치 별점주기" ? null : selectedRate,
-                diaryTitle:  document.querySelector('#title').value,
-                diaryWriting: document.querySelector('#content').value,
-                diaryWeather: selectedWeather === "null" ? null : selectedWeather.temperature
+                diaryVisitRate: selectedRate === null ? null : selectedRate,
+                diaryTitle: title,
+                diaryWriting: content,
+                diaryWeather: selectedWeather === "null" ? null : selectedWeather,
+                diaryAddress: selectedAddress,
+                diaryAddressName: selectedAddressName
             };
-            // if (diaryData.diaryTitle === null) {
-            //     alert("다이어리 제목을 입력하세요.");
-            //     return;
-            // }
-            //
-            // if (diaryData.diaryWriting === null) {
-            //     alert("다이어리 내용을 입력하세요.");
-            //     return;
-            // }
-            console.log(diaryData);
-            const url = "/api/user/" + diaryData.userId + "/diary";
+
+            console.log("클라이언트 다이어리 확인",diaryData);
+            const url = "/new/" + diaryData.userId;
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -108,7 +169,7 @@ export default function Diary() {
                 diaryCreateBtn.removeEventListener("click", handleButtonClick);
             }
         };
-    }, [selectedRate, selectedEmoji, locationInfo, selectedWeather]);
+    }, [selectedRate, selectedEmoji, locationInfo, selectedWeather, selectedImage]);
 
 
     return (
@@ -151,12 +212,10 @@ export default function Diary() {
                                     className="block rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
                                     style={{ cursor: 'pointer'}}
                                 >
-                                    <p className='text-center'>{selectedEmoji}</p>
+                                    <p className='text-center'>{selectedEmoji === null ? "기분" : selectedEmoji}</p>
                                 </div>
                             </ToolOptions>
                         </div>
-                        {/* 노래 */}
-                        <Music data = {writingData}/>
                     </div>
 
                     {/* 하단: 이미지, 일기 */}
@@ -189,7 +248,7 @@ export default function Diary() {
                                 </>
                             )}
                             <div className="mt-9">
-                                <Link to={'/search-location'}>
+                                <Link to={`/search-location/${save_date}`} onClick={handleLocationClick} >
                                     <div className="mt-3">
                                         <div
                                             className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
@@ -226,9 +285,8 @@ export default function Diary() {
                                             style={{cursor: 'pointer'}}
                                         >
                                             <p className="text-center">
-                                                {selectedRate}
-                                                {/*{selectedRate === '0점' ? '⚡' : selectedRate === '1점' ? '⭐' : selectedRate === '2점' ? '⭐⭐' : selectedRate === '3점'*/}
-                                                {/*                ? '⭐⭐⭐' : selectedRate === '4점' ? '⭐⭐⭐⭐' : selectedRate === '5점' ? '⭐⭐⭐⭐⭐' : selectedRate}*/}
+                                                {selectedRate === '0점' ? '🤢' : selectedRate === '1점' ? '⭐' : selectedRate === '2점' ? '⭐⭐' : selectedRate === '3점'
+                                                ? '⭐⭐⭐' : selectedRate === '4점' ? '⭐⭐⭐⭐' : selectedRate === '5점' ? '⭐⭐⭐⭐⭐' : selectedRate === null ? '위치 별점주기' : selectedRate} 
                                             </p>
                                         </div>
                                     </ToolOptions>
@@ -245,6 +303,8 @@ export default function Diary() {
                                     type="text"
                                     name="title"
                                     id="title"
+                                    value={selectedTitle}
+                                    onChange={(e) => setSelectedTitle(e.target.value)}
                                     autoComplete="given-name"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-200 sm:text-sm sm:leading-6 mt-2"
                                 />
@@ -257,10 +317,9 @@ export default function Diary() {
                                   rows={20}
                                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-200 sm:text-sm sm:leading-6 mt-2"
                                   defaultValue={''}
-                                  value={writingData}
-                                  onChange={handleWritingChange}
+                                  value={selectedWriting}
+                                onChange={(e) => setSelectedWriting(e.target.value)}
                               />
-                                <p>다이어리 내용: {writingData}</p>
                                 <input type="hidden" id="new-diary-user-id" value="123"></input>
 
                             </div>
@@ -272,14 +331,16 @@ export default function Diary() {
             <div className=" mr-20 flex items-center justify-end gap-x-6">
                 <Link to="/main">
                     <button type="button"
-                            className="inline-flex items-center rounded-md bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                            className="inline-flex items-center rounded-md bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                            onClick={handleCancelWriting}
+                            >
                         취소
                     </button>
                 </Link>
                 <button
                     type="button"
                     className="inline-flex items-center rounded-md bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                    id = "saveButton"
+                    id = "saveButton" 
                 >
                     저장
                 </button>

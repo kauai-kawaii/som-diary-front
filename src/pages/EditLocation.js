@@ -2,7 +2,7 @@ import React, {useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const {kakao} = window;
-export default function Location() {
+export default function EditLocation() {
     const navigate = useNavigate();
     const [location, setLocation] = useState([]); // 사용자가 클릭한 위치 이름을 저장할 변수
 
@@ -203,6 +203,7 @@ export default function Location() {
                     style={{height: '400px', width: '500px'}}
                 ></div>
             </div>
+            
             <input
                 type="button"
                 value="확인"
@@ -212,7 +213,7 @@ export default function Location() {
                         const save_date = window.location.pathname.split('/').pop();
                         if (save_date) {
                             // 선택한 위치 정보와 함께 다이어리 페이지로 이동
-                            navigate(`/diary/${save_date}`, { state: { location } });
+                            navigate(`/edit/${save_date}`, { state: { location } });
                         } else {
                             alert('유효한 날짜가 없습니다!');
                         }

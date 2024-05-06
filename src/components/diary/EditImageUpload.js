@@ -1,10 +1,11 @@
 import { PhotoIcon} from '@heroicons/react/24/solid'
-import { useState } from 'react';
-export default function ImageUpload({ onImageChange }){
+import { useState,useEffect } from 'react';
+
+export default function EditImageUpload({ onImageChange, savedImage }){
     const [selectedImage, setSelectedImage] = useState(null);
 
     const handleImageChange = (event) => {
-        const file = event.target.files[0];
+        const file = event.target.files[0]; 
 
         if (file) {
             const reader = new FileReader();
@@ -16,14 +17,24 @@ export default function ImageUpload({ onImageChange }){
         } else {
             setSelectedImage(null);
         }
-    };
+    };   
 
-    const handleDeleteImage = () => {
+    const handleDeleteImage =() => {
         setSelectedImage(null);
         onImageChange(null);
-        
     }
 
+
+    useEffect(() => {
+        if (savedImage) {
+            setSelectedImage(savedImage);
+        } else {
+            setSelectedImage(null); 
+        }
+    }, []);
+    
+
+    
     return(
         <div className="mt-3 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
             <div className="text-center">
