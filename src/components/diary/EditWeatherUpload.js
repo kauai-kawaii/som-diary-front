@@ -10,7 +10,7 @@ export default function WeatherUpload({ data, setWeatherData,savedWeather }) {
         if (savedWeather) {
             setWeatherInfo(savedWeather);
         } else {
-            console.log("erroer")
+            console.log("날씨정보없음")
         }
 
         if (data) {
@@ -20,7 +20,7 @@ export default function WeatherUpload({ data, setWeatherData,savedWeather }) {
             const getWeather = async (lat, lon) => {
                 try {
                     const response = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric&lang=kr`
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=kr`
                     );
 
                     if (!response.ok) {

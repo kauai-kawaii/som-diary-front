@@ -19,18 +19,22 @@ export default function EditImageUpload({ onImageChange, savedImage }){
         }
     };   
 
+    const handleDeleteImage =() => {
+        setSelectedImage(null);
+        onImageChange(null);
+    }
+
+
     useEffect(() => {
         if (savedImage) {
             setSelectedImage(savedImage);
         } else {
-            console.log("erroer")
+            setSelectedImage(null); 
         }
     }, []);
+    
 
-    const handleDeleteImage =() => {
-        setSelectedImage(null);
-    }
-
+    
     return(
         <div className="mt-3 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
             <div className="text-center">
