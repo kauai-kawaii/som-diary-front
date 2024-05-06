@@ -18,8 +18,10 @@ export default function ImageUpload({ onImageChange }){
         }
     };
 
-    const handleDeleteImage =() => {
+    const handleDeleteImage = () => {
         setSelectedImage(null);
+        onImageChange(null);
+        
     }
 
     return(
