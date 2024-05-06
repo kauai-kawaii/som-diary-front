@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import DailyModal from './DailyModal';
-import axios from "axios";
-const apiUrl = `/api/photos`
 
 
 function UserCalendar() {
@@ -17,7 +15,9 @@ function UserCalendar() {
 
     useEffect(() => {
         // 백엔드에서 이미지 데이터 가져오기
-        fetch(`/api/photos`)
+        fetch(`http://localhost:8081/photos`, {
+            credentials: 'include'
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch photo data');
@@ -50,13 +50,13 @@ function UserCalendar() {
             return (
                 photo.year === year &&
                 photo.month === month &&
-                photo.day === day
+                photo.date === day
             );
         });
 
         // 월간 뷰에서만 이미지를 표시하도록 설정
         if (matchingPhoto) {
-            const imagePath = matchingPhoto.image;
+            const imagePath = matchingPhoto.diaryPhoto;
 
             return (
                 <div className='relative'>
