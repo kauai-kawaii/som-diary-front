@@ -7,14 +7,14 @@ import Main from "./pages/Main";
 import Diary from "./pages/Diary";
 import EditDiary from "./pages/EditDiary";
 import Location from "./pages/Location";
-import Insight from "./pages/insight";
+import Insight from "./pages/Insight";
 
 function App() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/")
+      .get("http://localhost:8081/")
       .then((response) => {
         // response.data를 통해 서버 응답에 접근합니다.
         setMessage(response.data);
