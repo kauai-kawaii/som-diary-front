@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import UserCalendar from '../components/UserCalendar';
-import DailyModal from '../components/DailyModal';
+import UserCalendar from '../components/calendar/UserCalendar';
 
 function Main() {
     return (
@@ -13,7 +12,7 @@ function Main() {
                 <img
                     src={'diary-img.jpeg'}
                     alt={'Logo'}
-                    className={'hidden sm:block max-w-28'}
+                    className={'hidden sm:block max-w-28 mx-14'}
                 />
                 <div className='flex gap-x-6'>
                     <Link
