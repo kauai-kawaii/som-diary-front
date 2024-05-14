@@ -11,17 +11,6 @@ import Location from "./pages/Location";
 import Insight from "./pages/Insight";
 
 function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:8081/")
-      .then((response) => {
-        // response.data를 통해 서버 응답에 접근합니다.
-        setMessage(response.data);
-      })
-      .catch((error) => console.error("There was an error!", error));
-  }, []);
   return (
     <Router>
       <Routes>
