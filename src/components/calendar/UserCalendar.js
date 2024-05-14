@@ -73,7 +73,7 @@ function UserCalendar() {
     };
 
     return (
-        <div class='grow'>
+        <div className='grow'>
             <Calendar
                 onChange={onChange}
                 onClickDay={showModal}

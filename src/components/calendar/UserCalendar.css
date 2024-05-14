@@ -111,7 +111,7 @@
   .react-calendar__tile {
     position: relative;
     min-height: 100px;
-    max-height: 200px;
+    max-height: 170px;
     max-width: 100%;
     background: none;
     text-align: center;
@@ -140,11 +140,17 @@
   }
 
   .react-calendar__tile img {
-    width:100%;
+    margin: 1px;
     height:100%;
     object-fit:cover;
   }
   
+  .react-calendar__tile div {
+
+    height:100%;
+    object-fit:cover;
+  }
+
   .react-calendar__month-view__days__day--neighboringMonth:disabled,
   .react-calendar__decade-view__years__year--neighboringDecade:disabled,
   .react-calendar__century-view__decades__decade--neighboringCentury:disabled {
