@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+// import 'react-calendar/dist/Calendar.css';
 import DailyModal from './DailyModal';
-
+import './UserCalendar.css';
 
 function UserCalendar() {
     const [value, onChange] = useState(new Date());
@@ -73,7 +73,7 @@ function UserCalendar() {
     };
 
     return (
-        <div>
+        <div className='grow'>
             <Calendar
                 onChange={onChange}
                 onClickDay={showModal}
@@ -87,7 +87,7 @@ function UserCalendar() {
                 prev2Label={null}
                 showNeighboringMonth={false}
                 tileContent={getTileContent}
-                className={'aspect-video max-h-[550px] max-w-5xl'}
+                className={'aspect-video max-h-[550px] max-w-7xl'}
             />
             {modalOpen && (
                 <DailyModal setModalOpen={setModalOpen} date={value} />
