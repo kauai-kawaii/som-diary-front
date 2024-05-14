@@ -17,9 +17,11 @@ function DailyModal({ setModalOpen, userId, date }) {
         const parts = formattedDateForSave.split('. ');
         const save_date = `${parts[0]}-${parts[1]}-${parts[2].slice(0, 2)}`; //2024-02-24
 
-        const apiUrl = `/user/123/${save_date}`;
+        const apiUrl = `http://localhost:8081/user/${save_date}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            withCredentials: true
+        })
             .then(response => {
                 console.log('불러온 다이어리 데이터 확인:', response.data);
                 setDiary(response.data);
@@ -49,7 +51,9 @@ function DailyModal({ setModalOpen, userId, date }) {
     // 해당 다이어리 삭제
     const deleteDiary = () => {
         if(diary && window.confirm(`${diary.diaryDate} 다이어리를 정말 삭제할까요?`)){
-            axios.delete(`/diary/${diary.diaryId}`)
+            axios.delete(`http://localhost:8081/diary/${diary.diaryId}`, {
+                withCredentials: true
+            })
                 .then(function(response){
                     console.log(response);
                     closeModal();
