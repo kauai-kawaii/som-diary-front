@@ -25,10 +25,12 @@ export default function EditDiary() {
     const rates = ['0점', '1점', '2점', '3점', '4점', '5점', '취소'];
 
     useEffect(() => {
-        const apiUrl = `/edit/123/${save_date}`;
+        const apiUrl = `http://localhost:8081/edit/${save_date}`;
         console.log(apiUrl);
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            withCredentials: true
+        })
             .then(response => {
                 console.log('수정 페이지 데이터 불러오기:', response.data);
                 setDiary(response.data);
@@ -136,13 +138,14 @@ export default function EditDiary() {
                 diaryAddressName: selectedAddressName
             }
             console.log("수정된 클라이언트 다이어리 확인",diaryData);
-            const url = `/edit/${diaryData.userId}/${save_date}`;
+            const url = `/edit/${save_date}`;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(diaryData)
+                body: JSON.stringify(diaryData),
+                credentials: 'include'
             }).then(response => {
                 const msg = (response.ok) ? "다이어리가 수정되었습니다.!" : "다이어리 등록 실패";
                 alert(msg);

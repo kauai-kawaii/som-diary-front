@@ -144,13 +144,14 @@ export default function Diary() {
             };
 
             console.log("클라이언트 다이어리 확인",diaryData);
-            const url = "/new/" + diaryData.userId;
+            const url = "/new";
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(diaryData)
+                body: JSON.stringify(diaryData),
+                credentials: 'include'
             }).then(response => {
                 const msg = (response.ok) ? "다이어리가 등록됐습니다!" : "다이어리 등록 실패";
                 alert(msg);
