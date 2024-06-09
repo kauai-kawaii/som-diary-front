@@ -9,13 +9,30 @@ import EditDiary from "./pages/EditDiary";
 import EditLocation from "./pages/EditLocation";
 import Location from "./pages/Location";
 import Insight from "./pages/Insight";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/home" exact element={<Home />} />
-        <Route path="/get-start" exact element={<Start />} />
+        <Route
+          path="/home"
+          exact
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/get-start"
+          exact
+          element={
+            <ProtectedRoute>
+              <Start />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/main" exact element={<Main />} />
         <Route path="/insight" element={<Insight />} />
         <Route path="/edit/:save_date" element={<EditDiary />} />
